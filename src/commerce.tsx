@@ -175,7 +175,7 @@ const ProductCardSkeleton = ({ index }: { index: number }) => (
 
     {/* Skeleton button */}
     <div className="flex space-x-2 w-full">
-      <div className="flex-1 h-10 bg-gradient-to-r from-gray-300 to-gray-400 rounded-lg animate-pulse"></div>
+      <div className="flex-1 h-14 bg-gradient-to-r from-gray-300 to-gray-400 rounded-2xl animate-pulse"></div>
     </div>
   </div>
 );

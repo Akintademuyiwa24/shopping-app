@@ -5,7 +5,7 @@ type Product = {
     title: string;
     price: number;
     image: string;
-    desc: string;
+    description: string;
 };
 
 export const productApi = createApi({
@@ -15,8 +15,11 @@ export const productApi = createApi({
         getAllProducts: builder.query<Product[], void>({
             query: () => 'products',
         }),
+        getProductById: builder.query<Product, number>({
+            query: (id) => `products/${id}`,
+        }),
     }),
 });
-export const {useGetAllProductsQuery} = productApi;
+export const {useGetAllProductsQuery, useGetProductByIdQuery} = productApi;
 
 export const {reducer: productReducer} = productApi;

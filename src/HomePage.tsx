@@ -1,7 +1,7 @@
 import { useGetAllProductsQuery } from "./features/product/productAPI";
-import { ShoppingBag } from "lucide-react";
-
+import { ShoppingBag, Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useState } from "react";
 
 const people = [
   {
@@ -57,14 +57,43 @@ const people = [
 
 export function HomePage() {
   const { data } = useGetAllProductsQuery();
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+
   console.log("data", data);
+
   return (
-    <div className="min-h-screen">
-      <div className="hidden md:block mr-24">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+      {/* Mobile Navigation Toggle */}
+      <div className="md:hidden fixed top-4 left-4 z-50">
+        <button
+          onClick={() => setIsMobileNavOpen(!isMobileNavOpen)}
+          className="p-2 bg-white rounded-lg shadow-lg border border-gray-200"
+        >
+          {isMobileNavOpen ? (
+            <X className="h-6 w-6" />
+          ) : (
+            <Menu className="h-6 w-6" />
+          )}
+        </button>
+      </div>
+
+      {/* Desktop Navigation */}
+      <div className="hidden md:block">
         <Navigation />
       </div>
-      <main className="pl-16 md:pl-[300px] min-h-screen pt-0">
-        <div className="max-w-6xl mx-auto px-4 md:px-6 lg:px-8">
+
+      {/* Mobile Navigation Overlay */}
+      {isMobileNavOpen && (
+        <div className="md:hidden fixed inset-0 z-40 bg-black bg-opacity-50">
+          <div className="fixed inset-y-0 left-0 w-64 bg-white shadow-xl">
+            <MobileNavigation onClose={() => setIsMobileNavOpen(false)} />
+          </div>
+        </div>
+      )}
+
+      {/* Main Content */}
+      <main className="md:ml-72 min-h-screen">
+        <div className="w-full px-4 sm:px-6 lg:px-8">
           <Content />
         </div>
       </main>
@@ -74,41 +103,65 @@ export function HomePage() {
 
 function Content() {
   return (
-    <div className="bg-white py-24 sm:py-32">
-      <div className="mx-auto grid max-w-7xl gap-20 px-6 lg:px-8 xl:grid-cols-3">
-        <div className="max-w-xl">
-          <h2 className="text-3xl font-semibold tracking-tight text-pretty text-gray-900 sm:text-4xl">
-            Meet our leadership
-          </h2>
-          <p className="mt-6 text-lg/8 text-gray-600">
-            We’re a dynamic group of individuals who are passionate about what
-            we do and dedicated to delivering the best results for our clients.
-          </p>
-        </div>
-        <ul
-          role="list"
-          className="grid gap-x-8 gap-y-12 sm:grid-cols-2 sm:gap-y-16 xl:col-span-2 divide-y divide-amber-300 mb-2 pb-2"
-        >
-          {people.map((person) => (
-            <li key={person.name} className="divide-y divide-amber-300">
-              <div className="flex items-center gap-x-6 divide-y divide-amber-300">
-                <img
-                  alt=""
-                  src={person.imageUrl}
-                  className="size-16 rounded-full"
-                />
-                <div>
-                  <h3 className="text-base/7 font-semibold tracking-tight text-gray-900">
-                    {person.name}
-                  </h3>
-                  <p className="text-sm/6 font-semibold text-indigo-600">
-                    {person.role}
-                  </p>
+    <div className="bg-white/80 backdrop-blur-md rounded-3xl shadow-xl border border-gray-100 mx-2 sm:mx-4 md:mx-6 my-4 md:my-8">
+      <div className="px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-24">
+        <div className="mx-auto max-w-7xl">
+          {/* Header Section */}
+          <div className="text-center mb-12 lg:mb-16">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight bg-gradient-to-r from-blue-600 via-purple-500 to-pink-400 bg-clip-text text-transparent mb-6">
+              Meet our leadership
+            </h2>
+            <p className="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              We're a dynamic group of individuals who are passionate about what
+              we do and dedicated to delivering the best results for our
+              clients.
+            </p>
+          </div>
+
+          {/* Team Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10">
+            {people.map((person, idx) => (
+              <div
+                key={person.name}
+                className="bg-white/70 backdrop-blur-md rounded-2xl p-6 shadow-lg border border-gray-100 hover:scale-[1.02] hover:shadow-xl transition-all duration-300 animate-fade-up"
+                style={{ animationDelay: `${idx * 100}ms` }}
+              >
+                <div className="flex items-center space-x-4 mb-4">
+                  <img
+                    alt={person.name}
+                    src={person.imageUrl}
+                    className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover shadow-lg border-2 border-white"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-lg sm:text-xl font-semibold text-gray-900 truncate">
+                      {person.name}
+                    </h3>
+                    <p className="text-sm sm:text-base font-medium text-blue-600">
+                      {person.role}
+                    </p>
+                    {person.email && (
+                      <p className="text-xs sm:text-sm text-gray-500 truncate mt-1">
+                        {person.email}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Status Indicator */}
+                <div className="flex items-center space-x-2 text-xs sm:text-sm">
+                  <div
+                    className={`w-2 h-2 rounded-full ${
+                      person.lastSeen ? "bg-green-500" : "bg-gray-400"
+                    }`}
+                  ></div>
+                  <span className="text-gray-600">
+                    {person.lastSeen ? `Active ${person.lastSeen}` : "Offline"}
+                  </span>
                 </div>
               </div>
-            </li>
-          ))}
-        </ul>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -116,18 +169,64 @@ function Content() {
 
 export function Navigation() {
   return (
-    <aside className="fixed left-0 inset-y-0 w-16 md:w-84 bg-gray-50 border-r border-gray-200 flex flex-col py-4 px-2 md:px-4">
-      <div>
-        <p className="text-center text-sm font-semibold mt-10 text-gray-600">
-          Click on shopping bag below to begin your shopping
-        </p>
-        <Link
-          to="/commerce"
-          className="flex items-center justify-center h-16 w-full"
-        >
-          <ShoppingBag className="h-20 w-20 mt-20 text-gray-600" />
-        </Link>
+    <aside className="fixed left-0 inset-y-0 w-72 bg-white/90 backdrop-blur-md border-r border-gray-200 shadow-xl flex flex-col">
+      <div className="flex-1 flex flex-col items-center justify-center p-8">
+        <div className="text-center space-y-6">
+          <div className="w-32 h-32 bg-gradient-to-br from-blue-100 to-purple-100 rounded-3xl flex items-center justify-center shadow-lg">
+            <ShoppingBag className="h-16 w-16 text-blue-600" />
+          </div>
+
+          <div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">
+              Welcome to Our Store
+            </h3>
+            <p className="text-gray-600 text-sm leading-relaxed mb-6">
+              Discover amazing products and start your shopping journey with us
+              today.
+            </p>
+          </div>
+
+          <Link
+            to="/commerce"
+            className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-2xl shadow-lg hover:from-blue-700 hover:to-purple-700 transform hover:scale-[1.02] transition-all duration-200"
+          >
+            <ShoppingBag className="h-5 w-5 mr-2" />
+            Start Shopping
+          </Link>
+        </div>
       </div>
     </aside>
+  );
+}
+
+function MobileNavigation({ onClose }: { onClose: () => void }) {
+  return (
+    <div className="flex flex-col h-full p-6">
+      <div className="flex-1 flex flex-col items-center justify-center">
+        <div className="text-center space-y-6">
+          <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-purple-100 rounded-2xl flex items-center justify-center shadow-lg">
+            <ShoppingBag className="h-12 w-12 text-blue-600" />
+          </div>
+
+          <div>
+            <h3 className="text-lg font-bold text-gray-900 mb-2">
+              Welcome to Our Store
+            </h3>
+            <p className="text-gray-600 text-sm leading-relaxed mb-6">
+              Discover amazing products and start your shopping journey.
+            </p>
+          </div>
+
+          <Link
+            to="/commerce"
+            onClick={onClose}
+            className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-2xl shadow-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200"
+          >
+            <ShoppingBag className="h-5 w-5 mr-2" />
+            Start Shopping
+          </Link>
+        </div>
+      </div>
+    </div>
   );
 }
